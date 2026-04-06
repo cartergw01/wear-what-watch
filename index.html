@@ -21,7 +21,6 @@
             user-select: none;
         }
 
-        /* Subtle radial light at center */
         body::before {
             content: '';
             position: fixed;
@@ -30,7 +29,6 @@
             pointer-events: none;
         }
 
-        /* Per-watch ambient tint — shifts on land */
         #ambient {
             position: fixed;
             inset: 0;
@@ -65,7 +63,6 @@
             white-space: nowrap;
         }
 
-        /* ── Stage ────────────────────────────────── */
         .stage {
             display: flex;
             flex-direction: column;
@@ -73,24 +70,25 @@
             gap: 24px;
         }
 
-        /* ── Swivel container ───────────────────────── */
+        /* ── Swivel container — bigger ───────────────── */
         .swivel-wrap {
             position: relative;
-            width: 560px;
-            height: 620px;
+            width: 600px;
+            height: 680px;
+            touch-action: pan-y; /* allow vertical scroll, capture horizontal */
         }
 
-        /* ── Glass cylinder (back layer) ─────────────── */
+        /* ── Glass cylinder ──────────────────────────── */
+        /* face 290×510, radius 175 → cyl left=(600-300)/2=150, height=510, top=(680-510)/2=85 */
         .cyl {
             position: absolute;
-            left:  148px;  /* (560-264)/2 */
-            right: 148px;
-            top:   90px;   /* (620-440)/2 */
-            height: 440px;
+            left:  150px;
+            right: 150px;
+            top:   85px;
+            height: 510px;
             pointer-events: none;
         }
 
-        /* Cylinder body: frosted glass tube */
         .cyl-back {
             border-left:  2px solid rgba(255,255,255,0.95);
             border-right: 2px solid rgba(210,220,240,0.6);
@@ -107,13 +105,12 @@
                 inset -8px 0 20px rgba(185,205,240,0.1);
         }
 
-        /* Back half of top rim */
         .cyl-back::before {
             content: '';
             position: absolute;
-            top: -11px;
-            left: -5px; right: -5px;
-            height: 22px;
+            top: -12px;
+            left: -6px; right: -6px;
+            height: 24px;
             background: radial-gradient(ellipse 70% 55% at 50% 50%,
                 rgba(255,255,255,0.85),
                 rgba(215,228,252,0.5) 55%,
@@ -121,62 +118,52 @@
             );
             border: 1.5px solid rgba(255,255,255,0.75);
             border-radius: 50%;
-            box-shadow: 0 0 18px rgba(180,205,255,0.45);
+            box-shadow: 0 0 22px rgba(180,205,255,0.5);
         }
 
-        /* Back half of bottom rim */
         .cyl-back::after {
             content: '';
             position: absolute;
-            bottom: -11px;
-            left: -5px; right: -5px;
-            height: 22px;
+            bottom: -12px;
+            left: -6px; right: -6px;
+            height: 24px;
             background: rgba(200,215,245,0.12);
             border: 1px solid rgba(200,215,245,0.35);
             border-radius: 50%;
             box-shadow: 0 4px 12px rgba(160,185,230,0.2);
         }
 
-        /* Front half of top rim — sits IN FRONT of the panels */
         .cyl-front::before {
             content: '';
             position: absolute;
-            top: -11px;
-            left: -5px; right: -5px;
-            height: 11px;
-            background: linear-gradient(to bottom,
-                rgba(255,255,255,1),
-                rgba(230,240,255,0.85) 70%,
-                transparent
-            );
+            top: -12px;
+            left: -6px; right: -6px;
+            height: 12px;
+            background: linear-gradient(to bottom, rgba(255,255,255,1), rgba(230,240,255,0.85) 70%, transparent);
             border-top:   2px solid rgba(255,255,255,1);
             border-left:  1.5px solid rgba(230,240,255,0.7);
             border-right: 1.5px solid rgba(200,218,248,0.5);
             border-radius: 50% 50% 0 0 / 100% 100% 0 0;
-            box-shadow:
-                0 0 20px rgba(200,218,255,0.7),
-                0 2px  8px rgba(170,198,255,0.35);
+            box-shadow: 0 0 24px rgba(200,218,255,0.7), 0 2px 8px rgba(170,198,255,0.35);
         }
 
-        /* Front half of bottom rim */
         .cyl-front::after {
             content: '';
             position: absolute;
-            bottom: -11px;
-            left: -5px; right: -5px;
-            height: 11px;
+            bottom: -12px;
+            left: -6px; right: -6px;
+            height: 12px;
             background: rgba(210,225,250,0.25);
             border-bottom: 1.5px solid rgba(190,210,245,0.5);
-            border-left:   1px   solid rgba(190,210,245,0.3);
-            border-right:  1px   solid rgba(190,210,245,0.3);
+            border-left:   1px solid rgba(190,210,245,0.3);
+            border-right:  1px solid rgba(190,210,245,0.3);
             border-radius: 0 0 50% 50% / 0 0 100% 100%;
             box-shadow: 0 4px 10px rgba(160,185,230,0.25);
         }
 
-        /* Grounding shadow beneath the cylinder */
         .cyl-shadow {
             position: absolute;
-            bottom: 52px;
+            bottom: 44px;
             left: 120px; right: 120px;
             height: 30px;
             background: radial-gradient(ellipse, rgba(120,150,220,0.18) 0%, transparent 70%);
@@ -184,11 +171,11 @@
             pointer-events: none;
         }
 
-        /* ── 3D scene ────────────────────────────── */
+        /* ── 3D scene ────────────────────────────────── */
         .scene {
             position: absolute;
             inset: 0;
-            perspective: 840px;
+            perspective: 920px;
             perspective-origin: 50% 50%;
             display: flex;
             align-items: center;
@@ -197,41 +184,36 @@
 
         .rotor {
             position: relative;
-            width: 250px;
-            height: 440px;
+            width:  290px;
+            height: 510px;
             transform-style: preserve-3d;
         }
 
-        /* ── Face panels ─────────────────────────── */
+        /* ── Face panels ─────────────────────────────── */
         .face {
             position: absolute;
             inset: 0;
-            width:  250px;
-            height: 440px;
-            border-radius: 26px;
+            width:  290px;
+            height: 510px;
+            border-radius: 28px;
             overflow: hidden;
-
-            /* Layered frosted glass look */
             background:
                 linear-gradient(145deg, rgba(255,255,255,0.72) 0%, transparent 42%),
                 linear-gradient(170deg, rgba(236,244,255,0.94) 0%, rgba(218,232,255,0.82) 100%);
-
             border: 1px solid rgba(255,255,255,0.98);
             box-shadow:
-                0 32px 90px rgba(110,140,220,0.2),
-                0  8px 24px rgba( 90,120,200,0.1),
+                0 36px 100px rgba(110,140,220,0.22),
+                0  8px  24px rgba( 90,120,200,0.1),
                 inset 0  1px 0 rgba(255,255,255,1),
                 inset 0 -1px 0 rgba(140,170,240,0.12),
                 inset  1px 0 0 rgba(255,255,255,0.75),
                 inset -1px 0 0 rgba(140,168,238,0.1);
-
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 22px 16px 24px;
+            padding: 24px 18px 26px;
         }
 
-        /* Bright glare stripe across top-left */
         .face::before {
             content: '';
             position: absolute;
@@ -245,9 +227,9 @@
             pointer-events: none;
         }
 
-        .f0 { transform: rotateY(0deg)   translateZ(155px); }
-        .f1 { transform: rotateY(120deg) translateZ(155px); }
-        .f2 { transform: rotateY(240deg) translateZ(155px); }
+        .f0 { transform: rotateY(0deg)   translateZ(175px); }
+        .f1 { transform: rotateY(120deg) translateZ(175px); }
+        .f2 { transform: rotateY(240deg) translateZ(175px); }
 
         .face-img-wrap {
             flex: 1;
@@ -265,6 +247,12 @@
             object-fit: contain;
             object-position: center bottom;
             filter: drop-shadow(0 10px 28px rgba(80,110,200,0.2));
+        }
+
+        /* Omega photo has more whitespace — scale up to match */
+        .f0 .face-img-wrap img {
+            transform: scale(1.28);
+            transform-origin: center 65%;
         }
 
         .face-info {
@@ -287,7 +275,6 @@
             margin-top: 5px;
         }
 
-        /* ── Wear today reveal ───────────────────── */
         .wear-today {
             height: 18px;
             color: rgba(10,20,60,0.3);
@@ -299,7 +286,6 @@
         }
         .wear-today.show { opacity: 1; }
 
-        /* ── Spin button ─────────────────────────── */
         .btn {
             background: transparent;
             border: 1px solid rgba(10,20,60,0.12);
@@ -322,10 +308,9 @@
         .btn:active:not(:disabled) { transform: scale(0.96); }
         .btn:disabled { opacity: 0.25; cursor: default; }
 
-        /* ── Mobile scale ────────────────────────── */
-        @media (max-width: 600px) {
-            .swivel-wrap { transform: scale(0.65); transform-origin: center top; }
-            .stage { gap: 4px; }
+        @media (max-width: 640px) {
+            .swivel-wrap { transform: scale(0.6); transform-origin: center top; }
+            .stage { gap: 0px; margin-top: -80px; }
         }
     </style>
 </head>
@@ -335,7 +320,7 @@
 <div class="wordmark">Wear What Watch</div>
 
 <div class="stage">
-    <div class="swivel-wrap">
+    <div class="swivel-wrap" id="swivelWrap">
 
         <div class="cyl cyl-back"></div>
 
@@ -368,7 +353,7 @@
                     </div>
                     <div class="face-info">
                         <div class="face-name">Seiko Presage</div>
-                        <div class="face-sub">Presage · SRPB43</div>
+                        <div class="face-sub">SRPB43</div>
                     </div>
                 </div>
 
@@ -387,7 +372,6 @@
 <div class="date-line" id="dateLine"></div>
 
 <script>
-// Ambient tints per watch (light, for white bg)
 const glows = [
     "radial-gradient(ellipse 60% 55% at 50% 50%, rgba(38,90,195,0.07) 0%, transparent 70%)",
     "radial-gradient(ellipse 60% 55% at 50% 50%, rgba(100,115,135,0.07) 0%, transparent 70%)",
@@ -408,7 +392,9 @@ let angle    = 0;
 let spinning = false;
 
 function easeOutQuint(t) { return 1 - Math.pow(1 - t, 5); }
+function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
 
+// ── Spin (button / spacebar) ─────────────────────
 function spin() {
     if (spinning) return;
     spinning = true;
@@ -424,21 +410,24 @@ function spin() {
     if (delta < 1) delta = 360;
     const targetAngle = angle - (delta + 3 * 360);
 
-    const from     = angle;
-    const duration = 3000 + Math.random() * 900;
-    const startTs  = performance.now();
+    animateTo(targetAngle, easeOutQuint, 3000 + Math.random() * 900, winner);
+}
+
+function animateTo(targetAngle, easeFn, duration, winner) {
+    const from    = angle;
+    const startTs = performance.now();
 
     (function frame(now) {
         const t   = Math.min((now - startTs) / duration, 1);
-        const deg = from + (targetAngle - from) * easeOutQuint(t);
+        const deg = from + (targetAngle - from) * easeFn(t);
         rotor.style.transform = `rotateY(${deg}deg)`;
 
         if (t < 1) {
             requestAnimationFrame(frame);
         } else {
-            angle    = targetAngle;
+            angle   = targetAngle;
             spinning = false;
-            btn.disabled  = false;
+            btn.disabled = false;
             btn.textContent = 'SPIN AGAIN';
             wearToday.classList.add('show');
             ambient.style.background = glows[winner];
@@ -446,6 +435,112 @@ function spin() {
         }
     })(startTs);
 }
+
+// ── Spacebar ─────────────────────────────────────
+document.addEventListener('keydown', e => {
+    if (e.code === 'Space') {
+        e.preventDefault();
+        spin();
+    }
+});
+
+// ── Touch swipe to rotate ─────────────────────────
+// face i is at front when rotor = -i*120 (mod 360)
+// display mods: face0→0°, face1→240°, face2→120°
+const FACE_MODS = [0, 240, 120]; // index = face number
+
+function nearestFace() {
+    const currMod = ((angle % 360) + 360) % 360;
+    let best = { face: 0, signedDist: 0 };
+    let minAbs = Infinity;
+
+    for (let i = 0; i < 3; i++) {
+        let d = currMod - FACE_MODS[i];
+        // wrap to [-180, 180]
+        if (d >  180) d -= 360;
+        if (d < -180) d += 360;
+        if (Math.abs(d) < minAbs) {
+            minAbs = Math.abs(d);
+            best = { face: i, signedDist: d };
+        }
+    }
+    return best;
+}
+
+function snapToNearest() {
+    const { face, signedDist } = nearestFace();
+    const targetAngle = angle - signedDist;
+    const duration    = 200 + Math.abs(signedDist) * 2.5;
+
+    spinning = true;
+    btn.disabled = true;
+    const from    = angle;
+    const startTs = performance.now();
+
+    (function frame(now) {
+        const t   = Math.min((now - startTs) / duration, 1);
+        const deg = from + (targetAngle - from) * easeOutCubic(t);
+        rotor.style.transform = `rotateY(${deg}deg)`;
+
+        if (t < 1) {
+            requestAnimationFrame(frame);
+        } else {
+            angle    = targetAngle;
+            spinning = false;
+            btn.disabled = false;
+            btn.textContent = 'SPIN AGAIN';
+            wearToday.classList.add('show');
+            ambient.style.background = glows[face];
+            ambient.classList.add('show');
+        }
+    })(startTs);
+}
+
+let touchStartX    = null;
+let touchStartAngle = null;
+let lastTouchX     = null;
+let touchVelocity  = 0;
+let lastTouchTime  = null;
+
+document.getElementById('swivelWrap').addEventListener('touchstart', e => {
+    if (spinning) return;
+    touchStartX     = e.touches[0].clientX;
+    touchStartAngle = angle;
+    lastTouchX      = touchStartX;
+    touchVelocity   = 0;
+    lastTouchTime   = performance.now();
+    wearToday.classList.remove('show');
+}, { passive: true });
+
+document.getElementById('swivelWrap').addEventListener('touchmove', e => {
+    if (spinning || touchStartX === null) return;
+
+    const x    = e.touches[0].clientX;
+    const now  = performance.now();
+    const dt   = now - lastTouchTime;
+
+    if (dt > 0) {
+        touchVelocity = (lastTouchX - x) / dt; // deg per ms (scaled below)
+    }
+    lastTouchX   = x;
+    lastTouchTime = now;
+
+    const delta = x - touchStartX;
+    angle = touchStartAngle - delta * 0.45;
+    rotor.style.transform = `rotateY(${angle}deg)`;
+}, { passive: true });
+
+document.getElementById('swivelWrap').addEventListener('touchend', () => {
+    if (touchStartX === null) return;
+    touchStartX = null;
+
+    // Small flick momentum then snap
+    const momentum = touchVelocity * 120; // project forward ~120ms
+    angle -= momentum;
+    rotor.style.transform = `rotateY(${angle}deg)`;
+
+    requestAnimationFrame(() => snapToNearest());
+});
 </script>
 
 </body>
