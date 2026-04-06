@@ -11,7 +11,7 @@
         html, body { height: 100%; }
 
         body {
-            background: #06070a;
+            background: #f4f7fb;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -21,21 +21,31 @@
             user-select: none;
         }
 
-        /* Ambient color glow — shifts per watch */
+        /* Subtle radial light at center */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(ellipse 70% 60% at 50% 48%, #ffffff 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        /* Per-watch ambient tint — shifts on land */
         #ambient {
             position: fixed;
             inset: 0;
-            background: radial-gradient(ellipse 55% 55% at 50% 50%, rgba(30,55,110,0.14) 0%, transparent 70%);
-            transition: background 1.5s ease;
+            opacity: 0;
+            transition: opacity 1.4s ease, background 1.4s ease;
             pointer-events: none;
         }
+        #ambient.show { opacity: 1; }
 
         .wordmark {
             position: fixed;
             top: 28px;
             left: 50%;
             transform: translateX(-50%);
-            color: rgba(255,255,255,0.14);
+            color: rgba(10,20,50,0.25);
             font-size: 9px;
             letter-spacing: 7px;
             text-transform: uppercase;
@@ -48,108 +58,137 @@
             bottom: 26px;
             left: 50%;
             transform: translateX(-50%);
-            color: rgba(255,255,255,0.11);
+            color: rgba(10,20,50,0.2);
             font-size: 9px;
             letter-spacing: 3.5px;
             text-transform: uppercase;
             white-space: nowrap;
         }
 
-        /* ── Stage ─────────────────────────────── */
+        /* ── Stage ────────────────────────────────── */
         .stage {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 22px;
+            gap: 24px;
         }
 
-        /* ── Swivel container ───────────────────── */
+        /* ── Swivel container ───────────────────────── */
         .swivel-wrap {
             position: relative;
-            width: 480px;
-            height: 520px;
+            width: 560px;
+            height: 620px;
         }
 
-        /* ── Glass cylinder decoration ───────────── */
-        /* Rendered in DOM order: cyl-back → scene → cyl-front
-           No z-index needed — later elements naturally sit on top */
-
+        /* ── Glass cylinder (back layer) ─────────────── */
         .cyl {
             position: absolute;
-            left:  112px;   /* (480-256)/2 */
-            right: 112px;
-            top:   80px;
-            height: 360px;
+            left:  148px;  /* (560-264)/2 */
+            right: 148px;
+            top:   90px;   /* (620-440)/2 */
+            height: 440px;
             pointer-events: none;
         }
 
-        /* Cylinder body: side borders + subtle edge highlights */
+        /* Cylinder body: frosted glass tube */
         .cyl-back {
-            border-left:  1px solid rgba(255,255,255,0.09);
-            border-right: 1px solid rgba(255,255,255,0.09);
+            border-left:  2px solid rgba(255,255,255,0.95);
+            border-right: 2px solid rgba(210,220,240,0.6);
             background: linear-gradient(90deg,
-                rgba(255,255,255,0.045) 0%,
-                transparent 16%,
-                transparent 84%,
-                rgba(255,255,255,0.045) 100%
+                rgba(185,205,240,0.28) 0%,
+                rgba(210,225,248,0.07) 14%,
+                rgba(220,232,252,0.03) 35%,
+                rgba(220,232,252,0.03) 65%,
+                rgba(210,225,248,0.07) 86%,
+                rgba(185,205,240,0.22) 100%
             );
+            box-shadow:
+                inset 14px 0 32px rgba(185,205,240,0.18),
+                inset -8px 0 20px rgba(185,205,240,0.1);
         }
 
-        /* Back half of top rim (behind panels) */
+        /* Back half of top rim */
         .cyl-back::before {
             content: '';
             position: absolute;
-            top: -8px;
-            left: -3px; right: -3px;
-            height: 16px;
-            border: 1px solid rgba(255,255,255,0.1);
-            background: rgba(255,255,255,0.025);
+            top: -11px;
+            left: -5px; right: -5px;
+            height: 22px;
+            background: radial-gradient(ellipse 70% 55% at 50% 50%,
+                rgba(255,255,255,0.85),
+                rgba(215,228,252,0.5) 55%,
+                transparent 80%
+            );
+            border: 1.5px solid rgba(255,255,255,0.75);
             border-radius: 50%;
+            box-shadow: 0 0 18px rgba(180,205,255,0.45);
         }
+
         /* Back half of bottom rim */
         .cyl-back::after {
             content: '';
             position: absolute;
-            bottom: -8px;
-            left: -3px; right: -3px;
-            height: 16px;
-            border: 1px solid rgba(255,255,255,0.06);
-            background: transparent;
+            bottom: -11px;
+            left: -5px; right: -5px;
+            height: 22px;
+            background: rgba(200,215,245,0.12);
+            border: 1px solid rgba(200,215,245,0.35);
             border-radius: 50%;
+            box-shadow: 0 4px 12px rgba(160,185,230,0.2);
         }
 
-        /* Front half of top rim — renders ON TOP of panels */
+        /* Front half of top rim — sits IN FRONT of the panels */
         .cyl-front::before {
             content: '';
             position: absolute;
-            top: -8px;
-            left: -3px; right: -3px;
-            height: 8px;
-            background: linear-gradient(to bottom, rgba(255,255,255,0.22), rgba(255,255,255,0.05));
-            border-top:   1.5px solid rgba(255,255,255,0.38);
-            border-left:  1px   solid rgba(255,255,255,0.15);
-            border-right: 1px   solid rgba(255,255,255,0.15);
+            top: -11px;
+            left: -5px; right: -5px;
+            height: 11px;
+            background: linear-gradient(to bottom,
+                rgba(255,255,255,1),
+                rgba(230,240,255,0.85) 70%,
+                transparent
+            );
+            border-top:   2px solid rgba(255,255,255,1);
+            border-left:  1.5px solid rgba(230,240,255,0.7);
+            border-right: 1.5px solid rgba(200,218,248,0.5);
             border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+            box-shadow:
+                0 0 20px rgba(200,218,255,0.7),
+                0 2px  8px rgba(170,198,255,0.35);
         }
+
         /* Front half of bottom rim */
         .cyl-front::after {
             content: '';
             position: absolute;
-            bottom: -8px;
-            left: -3px; right: -3px;
-            height: 8px;
-            background: rgba(255,255,255,0.03);
-            border-bottom: 1px solid rgba(255,255,255,0.16);
-            border-left:   1px solid rgba(255,255,255,0.09);
-            border-right:  1px solid rgba(255,255,255,0.09);
+            bottom: -11px;
+            left: -5px; right: -5px;
+            height: 11px;
+            background: rgba(210,225,250,0.25);
+            border-bottom: 1.5px solid rgba(190,210,245,0.5);
+            border-left:   1px   solid rgba(190,210,245,0.3);
+            border-right:  1px   solid rgba(190,210,245,0.3);
             border-radius: 0 0 50% 50% / 0 0 100% 100%;
+            box-shadow: 0 4px 10px rgba(160,185,230,0.25);
         }
 
-        /* ── 3D perspective scene ─────────────── */
+        /* Grounding shadow beneath the cylinder */
+        .cyl-shadow {
+            position: absolute;
+            bottom: 52px;
+            left: 120px; right: 120px;
+            height: 30px;
+            background: radial-gradient(ellipse, rgba(120,150,220,0.18) 0%, transparent 70%);
+            filter: blur(8px);
+            pointer-events: none;
+        }
+
+        /* ── 3D scene ────────────────────────────── */
         .scene {
             position: absolute;
             inset: 0;
-            perspective: 750px;
+            perspective: 840px;
             perspective-origin: 50% 50%;
             display: flex;
             align-items: center;
@@ -158,51 +197,61 @@
 
         .rotor {
             position: relative;
-            width: 210px;
-            height: 360px;
+            width: 250px;
+            height: 440px;
             transform-style: preserve-3d;
-            /* transform set by JS */
         }
 
-        /* ── Watch face panels ────────────────── */
+        /* ── Face panels ─────────────────────────── */
         .face {
             position: absolute;
             inset: 0;
-            width:  210px;
-            height: 360px;
-            border-radius: 22px;
-            /* Light frosted glass */
-            background: rgba(246, 248, 252, 0.92);
-            border: 1px solid rgba(255,255,255,0.96);
+            width:  250px;
+            height: 440px;
+            border-radius: 26px;
+            overflow: hidden;
+
+            /* Layered frosted glass look */
+            background:
+                linear-gradient(145deg, rgba(255,255,255,0.72) 0%, transparent 42%),
+                linear-gradient(170deg, rgba(236,244,255,0.94) 0%, rgba(218,232,255,0.82) 100%);
+
+            border: 1px solid rgba(255,255,255,0.98);
             box-shadow:
-                0 28px 70px rgba(0,0,0,0.6),
-                0  4px 12px rgba(0,0,0,0.2),
-                inset 0  1px 0 rgba(255,255,255,0.95),
-                inset 0 -1px 0 rgba(0,0,0,0.04);
+                0 32px 90px rgba(110,140,220,0.2),
+                0  8px 24px rgba( 90,120,200,0.1),
+                inset 0  1px 0 rgba(255,255,255,1),
+                inset 0 -1px 0 rgba(140,170,240,0.12),
+                inset  1px 0 0 rgba(255,255,255,0.75),
+                inset -1px 0 0 rgba(140,168,238,0.1);
+
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 18px 14px 22px;
-            overflow: hidden;
+            padding: 22px 16px 24px;
         }
 
-        /* Top-left shine on each face */
+        /* Bright glare stripe across top-left */
         .face::before {
             content: '';
             position: absolute;
-            inset: 0;
-            background: linear-gradient(145deg, rgba(255,255,255,0.3) 0%, transparent 40%);
-            border-radius: inherit;
+            top: 0; left: 0; right: 0;
+            height: 55%;
+            background: linear-gradient(160deg,
+                rgba(255,255,255,0.55) 0%,
+                rgba(255,255,255,0.18) 35%,
+                transparent 60%
+            );
             pointer-events: none;
         }
 
-        .f0 { transform: rotateY(0deg)   translateZ(135px); }
-        .f1 { transform: rotateY(120deg) translateZ(135px); }
-        .f2 { transform: rotateY(240deg) translateZ(135px); }
+        .f0 { transform: rotateY(0deg)   translateZ(155px); }
+        .f1 { transform: rotateY(120deg) translateZ(155px); }
+        .f2 { transform: rotateY(240deg) translateZ(155px); }
 
         .face-img-wrap {
             flex: 1;
-            width: 180px;
+            width: 100%;
             min-height: 0;
             display: flex;
             align-items: flex-end;
@@ -215,47 +264,47 @@
             max-height: 100%;
             object-fit: contain;
             object-position: center bottom;
-            filter: drop-shadow(0 8px 20px rgba(0,0,0,0.18));
+            filter: drop-shadow(0 10px 28px rgba(80,110,200,0.2));
         }
 
         .face-info {
             flex-shrink: 0;
             text-align: center;
-            margin-top: 12px;
+            margin-top: 14px;
         }
 
         .face-name {
             font-family: 'Playfair Display', Georgia, serif;
-            color: rgba(10,12,28,0.82);
-            font-size: 13.5px;
+            color: rgba(10,18,50,0.84);
+            font-size: 14px;
             font-weight: 500;
         }
         .face-sub {
-            color: rgba(10,12,28,0.32);
+            color: rgba(10,18,50,0.3);
             font-size: 8px;
             letter-spacing: 3px;
             text-transform: uppercase;
             margin-top: 5px;
         }
 
-        /* ── "Wear today" reveal ─────────────── */
+        /* ── Wear today reveal ───────────────────── */
         .wear-today {
             height: 18px;
-            color: rgba(255,255,255,0.28);
+            color: rgba(10,20,60,0.3);
             font-size: 9px;
             letter-spacing: 5px;
             text-transform: uppercase;
             opacity: 0;
-            transition: opacity 0.8s ease 0.3s;
+            transition: opacity 0.8s ease 0.4s;
         }
         .wear-today.show { opacity: 1; }
 
-        /* ── Spin button ─────────────────────── */
+        /* ── Spin button ─────────────────────────── */
         .btn {
             background: transparent;
-            border: 1px solid rgba(255,255,255,0.1);
-            color: rgba(255,255,255,0.36);
-            padding: 13px 48px;
+            border: 1px solid rgba(10,20,60,0.12);
+            color: rgba(10,20,60,0.38);
+            padding: 13px 50px;
             border-radius: 100px;
             font-size: 9px;
             letter-spacing: 6px;
@@ -263,20 +312,20 @@
             cursor: pointer;
             font-family: 'Inter', sans-serif;
             font-weight: 300;
-            transition: border-color .35s, color .35s, box-shadow .35s, transform .1s;
+            transition: border-color .3s, color .3s, box-shadow .3s, transform .1s;
         }
         .btn:hover:not(:disabled) {
-            border-color: rgba(255,255,255,0.22);
-            color: rgba(255,255,255,0.7);
-            box-shadow: 0 0 40px rgba(255,255,255,0.03);
+            border-color: rgba(10,20,60,0.28);
+            color: rgba(10,20,60,0.72);
+            box-shadow: 0 4px 24px rgba(100,130,220,0.1);
         }
         .btn:active:not(:disabled) { transform: scale(0.96); }
-        .btn:disabled { opacity: 0.28; cursor: default; }
+        .btn:disabled { opacity: 0.25; cursor: default; }
 
-        /* ── Mobile scale ────────────────────── */
-        @media (max-width: 540px) {
-            .swivel-wrap { transform: scale(0.72); transform-origin: center top; }
-            .stage { gap: 8px; }
+        /* ── Mobile scale ────────────────────────── */
+        @media (max-width: 600px) {
+            .swivel-wrap { transform: scale(0.65); transform-origin: center top; }
+            .stage { gap: 4px; }
         }
     </style>
 </head>
@@ -286,13 +335,10 @@
 <div class="wordmark">Wear What Watch</div>
 
 <div class="stage">
-
     <div class="swivel-wrap">
 
-        <!-- Glass cylinder back layer (behind the panels) -->
         <div class="cyl cyl-back"></div>
 
-        <!-- 3D rotating scene -->
         <div class="scene">
             <div class="rotor" id="rotor">
 
@@ -329,24 +375,23 @@
             </div>
         </div>
 
-        <!-- Glass cylinder front layer (rim sits in front of panels) -->
         <div class="cyl cyl-front"></div>
+        <div class="cyl-shadow"></div>
 
     </div>
 
     <div class="wear-today" id="wearToday">Wear today</div>
     <button class="btn" id="btn" onclick="spin()">SPIN</button>
-
 </div>
 
 <div class="date-line" id="dateLine"></div>
 
 <script>
-// Ambient glow per watch (RGB)
+// Ambient tints per watch (light, for white bg)
 const glows = [
-    "38, 95, 190",   // Omega — deep blue
-    "115, 125, 138", // Speedtimer — cool silver
-    "32, 68, 155",   // Presage — rich blue
+    "radial-gradient(ellipse 60% 55% at 50% 50%, rgba(38,90,195,0.07) 0%, transparent 70%)",
+    "radial-gradient(ellipse 60% 55% at 50% 50%, rgba(100,115,135,0.07) 0%, transparent 70%)",
+    "radial-gradient(ellipse 60% 55% at 50% 50%, rgba(28,60,155,0.07) 0%, transparent 70%)",
 ];
 
 const rotor     = document.getElementById('rotor');
@@ -354,7 +399,6 @@ const btn       = document.getElementById('btn');
 const wearToday = document.getElementById('wearToday');
 const ambient   = document.getElementById('ambient');
 
-// Today's date
 document.getElementById('dateLine').textContent =
     new Date().toLocaleDateString('en-US', {
         weekday: 'long', month: 'long', day: 'numeric'
@@ -363,7 +407,6 @@ document.getElementById('dateLine').textContent =
 let angle    = 0;
 let spinning = false;
 
-// Quintic ease-out for satisfying deceleration
 function easeOutQuint(t) { return 1 - Math.pow(1 - t, 5); }
 
 function spin() {
@@ -371,17 +414,14 @@ function spin() {
     spinning = true;
     btn.disabled = true;
     wearToday.classList.remove('show');
+    ambient.classList.remove('show');
 
     const winner = Math.floor(Math.random() * 3);
 
-    // Compute how far to spin backward to land on winner
-    // Face i is at rotateY(i*120deg); to bring it to front, rotor must be at -(i*120)deg
     const currMod   = ((angle % 360) + 360) % 360;
     const targetMod = ((-winner * 120) % 360 + 360) % 360;
     let   delta     = (currMod - targetMod + 360) % 360;
-    if (delta < 1) delta = 360; // always spin at least one full rotation
-
-    // Add 3 full spins for drama
+    if (delta < 1) delta = 360;
     const targetAngle = angle - (delta + 3 * 360);
 
     const from     = angle;
@@ -401,8 +441,8 @@ function spin() {
             btn.disabled  = false;
             btn.textContent = 'SPIN AGAIN';
             wearToday.classList.add('show');
-            ambient.style.background =
-                `radial-gradient(ellipse 55% 55% at 50% 50%, rgba(${glows[winner]},0.18) 0%, transparent 70%)`;
+            ambient.style.background = glows[winner];
+            ambient.classList.add('show');
         }
     })(startTs);
 }
