@@ -256,16 +256,14 @@
         }
         .slot-tick { animation: slotTick 0.13s cubic-bezier(0.25, 0, 0.45, 1) forwards; }
 
-        /* ── Watch reveal — dramatic pull toward viewer on win ── */
-        @keyframes watchReveal {
-            0%   { transform: scale(0.80) translateY(20px); opacity: 0.40; }
-            50%  { transform: scale(1.10) translateY(-9px); opacity: 1.00; }
-            73%  { transform: scale(0.97) translateY(4px);                 }
-            88%  { transform: scale(1.02) translateY(-1px);                }
-            100% { transform: scale(1.00) translateY(0);                   }
+        /* ── Watch thud — slam into place on win ── */
+        @keyframes watchThud {
+            0%   { transform: scale(1.00); }
+            20%  { transform: scale(0.92); }
+            100% { transform: scale(1.00); }
         }
-        .watch-reveal {
-            animation: watchReveal 0.68s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        .watch-thud {
+            animation: watchThud 0.22s cubic-bezier(0.25, 0, 0.45, 1) forwards;
         }
 
         /* ── Mobile ─────────────────────────────────────── */
@@ -392,16 +390,10 @@ layout();
 window.addEventListener('resize', layout);
 
 // ── Easing ────────────────────────────────────────
-// Expo deceleration + micro-overshoot at the end for mechanical clunk
+// Quart ease-out: starts fast, decelerates hard like gravity — no bounce
 function easeSpinOut(t) {
     if (t >= 1) return 1;
-    const expo = 1 - Math.pow(2, -10 * t);
-    // Final 20%: add a tiny oscillation that peaks at ~1.8% overshoot
-    if (t > 0.8) {
-        const p = (t - 0.8) / 0.2;
-        return expo + Math.sin(p * Math.PI) * 0.018;
-    }
-    return expo;
+    return 1 - Math.pow(1 - t, 4);
 }
 // Spring snap with slight overshoot — makes scroll feel clicky
 function easeOutBack(t) {
@@ -419,11 +411,11 @@ function spin() {
     const others = [0, 1, 2].filter(i => i !== lastWinner);
     const winner = others[Math.floor(Math.random() * others.length)];
 
-    // Advance 3 full cycles + delta to land on winner
+    // Go backward 3 full cycles + backDelta to land on winner (spins DOWN)
     const currentWatch = slotIdx % N;
-    let delta = (winner - currentWatch + N) % N;
-    if (delta === 0) delta = N;
-    const targetIdx = slotIdx + 3 * N + delta;
+    let backDelta = (currentWatch - winner + N) % N;
+    if (backDelta === 0) backDelta = N;
+    const targetIdx = slotIdx - 3 * N - backDelta;
 
     const h     = itemH();
     const fromY = renderY;
@@ -444,18 +436,18 @@ function spin() {
             ambient.style.background = WATCHES[winner].glow;
             ambient.classList.add('show');
 
-            // Trigger dramatic pull reveal on winning watch image
+            // Thud impact on landing
             const winItem = strip.children[targetIdx];
             if (winItem) {
                 const wrap = winItem.querySelector('.slot-img-wrap');
-                wrap.classList.remove('watch-reveal');
+                wrap.classList.remove('watch-thud');
                 void wrap.offsetWidth;
-                wrap.classList.add('watch-reveal');
+                wrap.classList.add('watch-thud');
             }
 
-            // Silently reset to equivalent position if drifting toward end of strip
-            if (slotIdx > (REPS - 5) * N) {
-                slotIdx -= Math.floor(REPS / 2) * N;
+            // Silently reset if drifting toward start of strip
+            if (slotIdx < 5 * N) {
+                slotIdx += Math.floor(REPS / 2) * N;
                 setY(-slotIdx * itemH(), true);
             }
         }
