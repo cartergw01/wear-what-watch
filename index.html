@@ -256,15 +256,6 @@
         }
         .slot-tick { animation: slotTick 0.13s cubic-bezier(0.25, 0, 0.45, 1) forwards; }
 
-        /* ── Watch thud — slam into place on win ── */
-        @keyframes watchThud {
-            0%   { transform: scale(1.00); }
-            20%  { transform: scale(0.92); }
-            100% { transform: scale(1.00); }
-        }
-        .watch-thud {
-            animation: watchThud 0.22s cubic-bezier(0.25, 0, 0.45, 1) forwards;
-        }
 
         /* ── Mobile ─────────────────────────────────────── */
         @media (max-width: 640px) {
@@ -435,15 +426,6 @@ function spin() {
             btn.disabled = false;
             ambient.style.background = WATCHES[winner].glow;
             ambient.classList.add('show');
-
-            // Thud impact on landing
-            const winItem = strip.children[targetIdx];
-            if (winItem) {
-                const wrap = winItem.querySelector('.slot-img-wrap');
-                wrap.classList.remove('watch-thud');
-                void wrap.offsetWidth;
-                wrap.classList.add('watch-thud');
-            }
 
             // Silently reset if drifting toward start of strip
             if (slotIdx < 5 * N) {
