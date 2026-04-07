@@ -7,11 +7,50 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=Inter:wght@300;400&display=swap" rel="stylesheet">
     <style>
+        /* ── Theme tokens ──────────────────────────────── */
+        :root {
+            --bg:               #f5f4f0;
+            --spotlight:        radial-gradient(ellipse 60% 75% at 50% 42%, rgba(255,255,255,0.95) 0%, rgba(240,238,234,0.4) 55%, transparent 80%);
+            --img-shadow:       drop-shadow(0 28px 60px rgba(80,80,100,0.35)) drop-shadow(0 8px 20px rgba(60,60,80,0.2));
+            --face-name:        rgba(10,10,30,0.75);
+            --face-sub:         rgba(10,10,30,0.30);
+            --wordmark:         rgba(10,10,30,0.22);
+            --dateline:         rgba(10,10,30,0.18);
+            /* button — solid dark fill in light mode */
+            --btn-bg:           rgba(11, 11, 28, 0.92);
+            --btn-text:         rgba(255, 255, 255, 0.93);
+            --btn-ring:         transparent;
+            --btn-shadow:       0 4px 18px rgba(10,10,30,0.18), 0 1px 4px rgba(10,10,30,0.10);
+            --btn-hover-bg:     rgba(11, 11, 28, 1.0);
+            --btn-hover-shadow: 0 10px 40px rgba(10,10,30,0.30), 0 3px 10px rgba(10,10,30,0.16);
+            --toggle-border:    rgba(10,10,30,0.10);
+            --toggle-color:     rgba(10,10,30,0.40);
+        }
+        body.dark {
+            --bg:               #080c18;
+            --spotlight:        radial-gradient(ellipse 55% 70% at 50% 40%, rgba(255,255,255,0.055) 0%, transparent 65%);
+            --img-shadow:       drop-shadow(0 35px 80px rgba(0,0,0,0.95)) drop-shadow(0 10px 30px rgba(0,0,0,0.7));
+            --face-name:        rgba(220,228,255,0.88);
+            --face-sub:         rgba(160,180,240,0.40);
+            --wordmark:         rgba(160,180,240,0.22);
+            --dateline:         rgba(160,180,240,0.18);
+            /* button — frosted-glass glow in dark mode */
+            --btn-bg:           rgba(255,255,255,0.07);
+            --btn-text:         rgba(215, 228, 255, 0.96);
+            --btn-ring:         rgba(180, 205, 255, 0.22);
+            --btn-shadow:       0 0 0 1px rgba(160,190,255,0.10), 0 8px 40px rgba(0,0,0,0.55), 0 0 56px rgba(90,130,255,0.07);
+            --btn-hover-bg:     rgba(255,255,255,0.12);
+            --btn-hover-shadow: 0 0 0 1px rgba(180,210,255,0.32), 0 12px 52px rgba(0,0,0,0.65), 0 0 80px rgba(90,130,255,0.14);
+            --toggle-border:    rgba(160,180,240,0.15);
+            --toggle-color:     rgba(160,180,240,0.50);
+        }
+
+        /* ── Reset ─────────────────────────────────────── */
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
         html, body { height: 100%; }
 
         body {
-            background: #f4f7fb;
+            background: var(--bg);
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -19,527 +58,510 @@
             font-family: 'Inter', system-ui, sans-serif;
             overflow: hidden;
             user-select: none;
+            transition: background 0.5s;
+            cursor: default;
         }
 
         body::before {
             content: '';
             position: fixed;
             inset: 0;
-            background: radial-gradient(ellipse 70% 60% at 50% 48%, #ffffff 0%, transparent 70%);
+            background: var(--spotlight);
             pointer-events: none;
+            transition: background 0.5s;
+            z-index: 0;
         }
 
         #ambient {
             position: fixed;
             inset: 0;
             opacity: 0;
-            transition: opacity 1.4s ease, background 1.4s ease;
+            transition: opacity 1.8s ease, background 1.8s ease;
             pointer-events: none;
+            z-index: 0;
         }
         #ambient.show { opacity: 1; }
 
+        /* ── Wordmark ───────────────────────────────────── */
         .wordmark {
             position: fixed;
-            top: 28px;
-            left: 50%;
+            top: 28px; left: 50%;
             transform: translateX(-50%);
-            color: rgba(10,20,50,0.25);
+            color: var(--wordmark);
             font-size: 9px;
             letter-spacing: 7px;
             text-transform: uppercase;
             font-weight: 300;
             white-space: nowrap;
+            transition: color 0.5s;
+            pointer-events: none;
+            z-index: 10;
         }
 
+        /* ── Dark toggle ────────────────────────────────── */
+        .toggle-dark {
+            position: fixed;
+            top: 22px; right: 22px;
+            width: 34px; height: 34px;
+            border-radius: 50%;
+            border: 1px solid var(--toggle-border);
+            background: transparent;
+            color: var(--toggle-color);
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: border-color .3s, color .3s, transform .15s;
+            touch-action: manipulation;
+            z-index: 100;
+        }
+        .toggle-dark:hover  { transform: scale(1.12); border-color: var(--btn-hover-border); }
+        .toggle-dark:active { transform: scale(0.94); }
+
+        /* ── Date ───────────────────────────────────────── */
         .date-line {
             position: fixed;
-            bottom: 26px;
-            left: 50%;
+            bottom: 26px; left: 50%;
             transform: translateX(-50%);
-            color: rgba(10,20,50,0.2);
+            color: var(--dateline);
             font-size: 9px;
             letter-spacing: 3.5px;
             text-transform: uppercase;
             white-space: nowrap;
+            transition: color 0.5s;
+            pointer-events: none;
+            z-index: 10;
         }
 
+        /* ── Stage ──────────────────────────────────────── */
         .stage {
+            position: relative;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 24px;
+            gap: 28px;
+            z-index: 1;
         }
 
-        /* ── Swivel container — bigger ───────────────── */
-        .swivel-wrap {
+        /* ── Slot machine ───────────────────────────────── */
+        /*
+         * The viewport clips the scrolling strip. The CSS mask creates
+         * a fade at top/bottom so adjacent watches blur into the background,
+         * giving the classic slot-reel depth effect.
+         */
+        .slot-viewport {
             position: relative;
-            width: 600px;
-            height: 680px;
-            touch-action: pan-y; /* allow vertical scroll, capture horizontal */
-        }
-
-        /* ── Glass cylinder ──────────────────────────── */
-        /* face 290×510, radius 175 → cyl left=(600-300)/2=150, height=510, top=(680-510)/2=85 */
-        .cyl {
-            position: absolute;
-            left:  150px;
-            right: 150px;
-            top:   85px;
-            height: 510px;
-            pointer-events: none;
-        }
-
-        .cyl-back {
-            border-left:  2px solid rgba(255,255,255,0.95);
-            border-right: 2px solid rgba(210,220,240,0.6);
-            background: linear-gradient(90deg,
-                rgba(185,205,240,0.28) 0%,
-                rgba(210,225,248,0.07) 14%,
-                rgba(220,232,252,0.03) 35%,
-                rgba(220,232,252,0.03) 65%,
-                rgba(210,225,248,0.07) 86%,
-                rgba(185,205,240,0.22) 100%
-            );
-            box-shadow:
-                inset 14px 0 32px rgba(185,205,240,0.18),
-                inset -8px 0 20px rgba(185,205,240,0.1);
-        }
-
-        .cyl-back::before {
-            content: '';
-            position: absolute;
-            top: -12px;
-            left: -6px; right: -6px;
-            height: 24px;
-            background: radial-gradient(ellipse 70% 55% at 50% 50%,
-                rgba(255,255,255,0.85),
-                rgba(215,228,252,0.5) 55%,
-                transparent 80%
-            );
-            border: 1.5px solid rgba(255,255,255,0.75);
-            border-radius: 50%;
-            box-shadow: 0 0 22px rgba(180,205,255,0.5);
-        }
-
-        .cyl-back::after {
-            content: '';
-            position: absolute;
-            bottom: -12px;
-            left: -6px; right: -6px;
-            height: 24px;
-            background: rgba(200,215,245,0.12);
-            border: 1px solid rgba(200,215,245,0.35);
-            border-radius: 50%;
-            box-shadow: 0 4px 12px rgba(160,185,230,0.2);
-        }
-
-        .cyl-front::before {
-            content: '';
-            position: absolute;
-            top: -12px;
-            left: -6px; right: -6px;
-            height: 12px;
-            background: linear-gradient(to bottom, rgba(255,255,255,1), rgba(230,240,255,0.85) 70%, transparent);
-            border-top:   2px solid rgba(255,255,255,1);
-            border-left:  1.5px solid rgba(230,240,255,0.7);
-            border-right: 1.5px solid rgba(200,218,248,0.5);
-            border-radius: 50% 50% 0 0 / 100% 100% 0 0;
-            box-shadow: 0 0 24px rgba(200,218,255,0.7), 0 2px 8px rgba(170,198,255,0.35);
-        }
-
-        .cyl-front::after {
-            content: '';
-            position: absolute;
-            bottom: -12px;
-            left: -6px; right: -6px;
-            height: 12px;
-            background: rgba(210,225,250,0.25);
-            border-bottom: 1.5px solid rgba(190,210,245,0.5);
-            border-left:   1px solid rgba(190,210,245,0.3);
-            border-right:  1px solid rgba(190,210,245,0.3);
-            border-radius: 0 0 50% 50% / 0 0 100% 100%;
-            box-shadow: 0 4px 10px rgba(160,185,230,0.25);
-        }
-
-        .cyl-shadow {
-            position: absolute;
-            bottom: 44px;
-            left: 120px; right: 120px;
-            height: 30px;
-            background: radial-gradient(ellipse, rgba(120,150,220,0.18) 0%, transparent 70%);
-            filter: blur(8px);
-            pointer-events: none;
-        }
-
-        /* ── 3D scene ────────────────────────────────── */
-        .scene {
-            position: absolute;
-            inset: 0;
-            perspective: 920px;
-            perspective-origin: 50% 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .rotor {
-            position: relative;
-            width:  290px;
-            height: 510px;
-            transform-style: preserve-3d;
-        }
-
-        /* ── Face panels ─────────────────────────────── */
-        .face {
-            position: absolute;
-            inset: 0;
-            width:  290px;
-            height: 510px;
-            border-radius: 28px;
+            width: clamp(260px, 88vw, 500px);
+            height: clamp(340px, 62vh, 580px);
             overflow: hidden;
-            background:
-                linear-gradient(145deg, rgba(255,255,255,0.72) 0%, transparent 42%),
-                linear-gradient(170deg, rgba(236,244,255,0.94) 0%, rgba(218,232,255,0.82) 100%);
-            border: 1px solid rgba(255,255,255,0.98);
-            box-shadow:
-                0 36px 100px rgba(110,140,220,0.22),
-                0  8px  24px rgba( 90,120,200,0.1),
-                inset 0  1px 0 rgba(255,255,255,1),
-                inset 0 -1px 0 rgba(140,170,240,0.12),
-                inset  1px 0 0 rgba(255,255,255,0.75),
-                inset -1px 0 0 rgba(140,168,238,0.1);
+            -webkit-mask-image: linear-gradient(to bottom,
+                transparent 0%, black 18%, black 82%, transparent 100%);
+            mask-image: linear-gradient(to bottom,
+                transparent 0%, black 18%, black 82%, transparent 100%);
+        }
+
+        .slot-strip {
+            display: flex;
+            flex-direction: column;
+            will-change: transform;
+        }
+
+        /* Each item matches viewport height exactly → one watch visible at a time */
+        .slot-item {
+            flex-shrink: 0;
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 24px 18px 26px;
+            padding: 24px 20px 20px;
         }
 
-        .face::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0;
-            height: 55%;
-            background: linear-gradient(160deg,
-                rgba(255,255,255,0.55) 0%,
-                rgba(255,255,255,0.18) 35%,
-                transparent 60%
-            );
-            pointer-events: none;
-        }
-
-        .f0 { transform: rotateY(0deg)   translateZ(175px); }
-        .f1 { transform: rotateY(120deg) translateZ(175px); }
-        .f2 { transform: rotateY(240deg) translateZ(175px); }
-
-        .face-img-wrap {
+        .slot-img-wrap {
             flex: 1;
             width: 100%;
             min-height: 0;
             display: flex;
-            align-items: flex-end;
+            align-items: center;
             justify-content: center;
-            overflow: hidden;
         }
 
-        .face-img-wrap img {
-            max-width:  100%;
+        .slot-img-wrap img {
+            max-width: 88%;
             max-height: 100%;
             object-fit: contain;
-            object-position: center bottom;
-            filter: drop-shadow(0 10px 28px rgba(80,110,200,0.2));
+            filter: var(--img-shadow);
+            transition: filter 0.5s;
+            pointer-events: none;
+            draggable: false;
         }
 
-        /* Omega photo has more whitespace — scale up to match */
-        .f0 .face-img-wrap img {
-            transform: scale(1.28);
-            transform-origin: center 65%;
-        }
-
-        .face-info {
+        .slot-label {
             flex-shrink: 0;
             text-align: center;
-            margin-top: 14px;
+            padding-top: 16px;
         }
 
         .face-name {
             font-family: 'Playfair Display', Georgia, serif;
-            color: rgba(10,18,50,0.84);
-            font-size: 14px;
-            font-weight: 500;
+            color: var(--face-name);
+            font-size: 15px;
+            font-weight: 400;
+            transition: color 0.5s;
         }
+
         .face-sub {
-            color: rgba(10,18,50,0.3);
+            color: var(--face-sub);
             font-size: 8px;
-            letter-spacing: 3px;
+            letter-spacing: 3.5px;
             text-transform: uppercase;
-            margin-top: 5px;
+            margin-top: 6px;
+            transition: color 0.5s;
         }
 
-        .wear-today {
-            height: 18px;
-            color: rgba(10,20,60,0.3);
-            font-size: 9px;
-            letter-spacing: 5px;
-            text-transform: uppercase;
-            opacity: 0;
-            transition: opacity 0.8s ease 0.4s;
-        }
-        .wear-today.show { opacity: 1; }
-
+        /* ── SPIN button ────────────────────────────────── */
         .btn {
-            background: transparent;
-            border: 1px solid rgba(10,20,60,0.12);
-            color: rgba(10,20,60,0.38);
-            padding: 13px 50px;
+            background: var(--btn-bg);
+            border: 1px solid var(--btn-ring);
+            color: var(--btn-text);
+            padding: 18px 70px;
             border-radius: 100px;
-            font-size: 9px;
-            letter-spacing: 6px;
+            font-size: 9.5px;
+            letter-spacing: 8px;
             text-transform: uppercase;
             cursor: pointer;
             font-family: 'Inter', sans-serif;
-            font-weight: 300;
-            transition: border-color .3s, color .3s, box-shadow .3s, transform .1s;
+            font-weight: 400;
+            box-shadow: var(--btn-shadow);
+            transition: background .35s, box-shadow .35s, border-color .35s, transform .12s;
+            position: relative;
+            z-index: 1;
+            touch-action: manipulation;
         }
         .btn:hover:not(:disabled) {
-            border-color: rgba(10,20,60,0.28);
-            color: rgba(10,20,60,0.72);
-            box-shadow: 0 4px 24px rgba(100,130,220,0.1);
+            background: var(--btn-hover-bg);
+            box-shadow: var(--btn-hover-shadow);
+            transform: translateY(-2px);
         }
-        .btn:active:not(:disabled) { transform: scale(0.96); }
-        .btn:disabled { opacity: 0.25; cursor: default; }
+        .btn:active:not(:disabled) {
+            transform: translateY(0) scale(0.97);
+            box-shadow: var(--btn-shadow);
+        }
+        .btn:disabled { opacity: 0.22; cursor: default; transform: none; }
 
+        /* ── Slot tick — detent pop as a watch enters center ── */
+        @keyframes slotTick {
+            0%   { transform: scale(1.0)  translateY(0);   }
+            30%  { transform: scale(0.93) translateY(4px); }
+            100% { transform: scale(1.0)  translateY(0);   }
+        }
+        .slot-tick { animation: slotTick 0.13s cubic-bezier(0.25, 0, 0.45, 1) forwards; }
+
+        /* ── Watch reveal — dramatic pull toward viewer on win ── */
+        @keyframes watchReveal {
+            0%   { transform: scale(0.80) translateY(20px); opacity: 0.40; }
+            50%  { transform: scale(1.10) translateY(-9px); opacity: 1.00; }
+            73%  { transform: scale(0.97) translateY(4px);                 }
+            88%  { transform: scale(1.02) translateY(-1px);                }
+            100% { transform: scale(1.00) translateY(0);                   }
+        }
+        .watch-reveal {
+            animation: watchReveal 0.68s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+
+        /* ── Mobile ─────────────────────────────────────── */
         @media (max-width: 640px) {
-            .swivel-wrap { transform: scale(0.6); transform-origin: center top; }
-            .stage { gap: 0px; margin-top: -80px; }
+            .stage    { gap: 20px; }
+            .btn      { padding: 15px 44px; }
+            .wordmark { letter-spacing: 5px; }
+        }
+
+        /* ── Landscape mobile ───────────────────────────── */
+        @media (max-width: 900px) and (max-height: 480px) {
+            .slot-viewport { height: 50vh; height: 50svh; }
+            .stage    { gap: 10px; }
+            .wordmark { top: 14px; }
+            .date-line { bottom: 12px; }
         }
     </style>
 </head>
-<body>
+<body class="dark">
 
 <div id="ambient"></div>
 <div class="wordmark">Wear What Watch</div>
+<button class="toggle-dark" id="toggleDark" title="Toggle light/dark">☀</button>
 
 <div class="stage">
-    <div class="swivel-wrap" id="swivelWrap">
-
-        <div class="cyl cyl-back"></div>
-
-        <div class="scene">
-            <div class="rotor" id="rotor">
-
-                <div class="face f0">
-                    <div class="face-img-wrap">
-                        <img src="photos/aquaterra.jpg" alt="Omega Seamaster Aqua Terra">
-                    </div>
-                    <div class="face-info">
-                        <div class="face-name">Omega Seamaster</div>
-                        <div class="face-sub">Aqua Terra · 38mm</div>
-                    </div>
-                </div>
-
-                <div class="face f1">
-                    <div class="face-img-wrap">
-                        <img src="photos/speedtimer_nightvision.jpg" alt="Seiko Prospex Speedtimer Night Vision">
-                    </div>
-                    <div class="face-info">
-                        <div class="face-name">Seiko Prospex</div>
-                        <div class="face-sub">Speedtimer · Night Vision</div>
-                    </div>
-                </div>
-
-                <div class="face f2">
-                    <div class="face-img-wrap">
-                        <img src="photos/presage_white.png" alt="Seiko Presage">
-                    </div>
-                    <div class="face-info">
-                        <div class="face-name">Seiko Presage</div>
-                        <div class="face-sub">SRPB43</div>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-
-        <div class="cyl cyl-front"></div>
-        <div class="cyl-shadow"></div>
-
+    <div class="slot-viewport" id="viewport">
+        <div class="slot-strip" id="strip"></div>
     </div>
-
-    <div class="wear-today" id="wearToday">Wear today</div>
     <button class="btn" id="btn" onclick="spin()">SPIN</button>
 </div>
 
 <div class="date-line" id="dateLine"></div>
 
 <script>
-const glows = [
-    "radial-gradient(ellipse 60% 55% at 50% 50%, rgba(38,90,195,0.07) 0%, transparent 70%)",
-    "radial-gradient(ellipse 60% 55% at 50% 50%, rgba(100,115,135,0.07) 0%, transparent 70%)",
-    "radial-gradient(ellipse 60% 55% at 50% 50%, rgba(28,60,155,0.07) 0%, transparent 70%)",
+const WATCHES = [
+    {
+        img:  'photos/aquaterra.png',
+        name: 'Omega Seamaster',
+        sub:  'Aqua Terra · 38mm',
+        glow: 'radial-gradient(ellipse 70% 60% at 50% 50%, rgba(30,70,200,0.22) 0%, transparent 70%)'
+    },
+    {
+        img:  'photos/speedtimer_nightvision.png',
+        name: 'Seiko Prospex',
+        sub:  'Speedtimer · SSC813',
+        glow: 'radial-gradient(ellipse 70% 60% at 50% 50%, rgba(60,80,110,0.18) 0%, transparent 70%)'
+    },
+    {
+        img:  'photos/presage_white.png',
+        name: 'Seiko Presage',
+        sub:  'SRPB43 · Automatic',
+        glow: 'radial-gradient(ellipse 70% 60% at 50% 50%, rgba(20,50,170,0.20) 0%, transparent 70%)'
+    }
 ];
 
-const rotor     = document.getElementById('rotor');
-const btn       = document.getElementById('btn');
-const wearToday = document.getElementById('wearToday');
-const ambient   = document.getElementById('ambient');
+const N    = WATCHES.length;
+const REPS = 15; // strip = 45 items total; resets silently keep idx in safe zone
 
+const viewport = document.getElementById('viewport');
+const strip    = document.getElementById('strip');
+const btn      = document.getElementById('btn');
+const ambient  = document.getElementById('ambient');
+
+// ── Build strip (REPS repetitions of all watches) ──
+for (let r = 0; r < REPS; r++) {
+    for (let i = 0; i < N; i++) {
+        const w    = WATCHES[i];
+        const item = document.createElement('div');
+        item.className = 'slot-item';
+        item.innerHTML = `
+            <div class="slot-img-wrap">
+                <img src="${w.img}" alt="${w.name}" draggable="false">
+            </div>
+            <div class="slot-label">
+                <div class="face-name">${w.name}</div>
+                <div class="face-sub">${w.sub}</div>
+            </div>`;
+        strip.appendChild(item);
+    }
+}
+
+// ── Date ──────────────────────────────────────────
 document.getElementById('dateLine').textContent =
     new Date().toLocaleDateString('en-US', {
         weekday: 'long', month: 'long', day: 'numeric'
     }).toUpperCase();
 
-let angle    = 0;
-let spinning = false;
+// ── Dark mode toggle ──────────────────────────────
+const toggleBtn = document.getElementById('toggleDark');
+toggleBtn.addEventListener('click', e => {
+    e.stopPropagation();
+    const isDark = document.body.classList.toggle('dark');
+    toggleBtn.textContent = isDark ? '☀' : '🌙';
+});
 
-function easeOutQuint(t) { return 1 - Math.pow(1 - t, 5); }
-function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
+// ── State ─────────────────────────────────────────
+// slotIdx: which item in the strip is currently centered.
+// Start at the middle of the strip, watch 0.
+let slotIdx    = Math.floor(REPS / 2) * N;
+let renderY    = 0;   // current strip translateY in px
+let spinning   = false;
+let lastWinner = -1;
 
-// ── Spin (button / spacebar) ─────────────────────
+function itemH() { return viewport.clientHeight; }
+
+function setY(y, instant) {
+    renderY = y;
+    if (instant) {
+        strip.style.transition = 'none';
+        strip.style.transform  = `translateY(${y}px)`;
+        strip.offsetHeight;    // force reflow
+    } else {
+        strip.style.transform = `translateY(${y}px)`;
+    }
+}
+
+function layout() {
+    const h = itemH();
+    strip.querySelectorAll('.slot-item').forEach(el => { el.style.height = h + 'px'; });
+    setY(-slotIdx * h, true);
+}
+
+layout();
+window.addEventListener('resize', layout);
+
+// ── Easing ────────────────────────────────────────
+// Expo deceleration + micro-overshoot at the end for mechanical clunk
+function easeSpinOut(t) {
+    if (t >= 1) return 1;
+    const expo = 1 - Math.pow(2, -10 * t);
+    // Final 20%: add a tiny oscillation that peaks at ~1.8% overshoot
+    if (t > 0.8) {
+        const p = (t - 0.8) / 0.2;
+        return expo + Math.sin(p * Math.PI) * 0.018;
+    }
+    return expo;
+}
+// Spring snap with slight overshoot — makes scroll feel clicky
+function easeOutBack(t) {
+    const c1 = 1.55, c3 = c1 + 1;
+    return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2);
+}
+
+// ── Spin ──────────────────────────────────────────
 function spin() {
     if (spinning) return;
     spinning = true;
     btn.disabled = true;
-    wearToday.classList.remove('show');
     ambient.classList.remove('show');
 
-    const winner = Math.floor(Math.random() * 3);
+    const others = [0, 1, 2].filter(i => i !== lastWinner);
+    const winner = others[Math.floor(Math.random() * others.length)];
 
-    const currMod   = ((angle % 360) + 360) % 360;
-    const targetMod = ((-winner * 120) % 360 + 360) % 360;
-    let   delta     = (currMod - targetMod + 360) % 360;
-    if (delta < 1) delta = 360;
-    const targetAngle = angle - (delta + 3 * 360);
+    // Advance 3 full cycles + delta to land on winner
+    const currentWatch = slotIdx % N;
+    let delta = (winner - currentWatch + N) % N;
+    if (delta === 0) delta = N;
+    const targetIdx = slotIdx + 3 * N + delta;
 
-    animateTo(targetAngle, easeOutQuint, 3000 + Math.random() * 900, winner);
-}
-
-function animateTo(targetAngle, easeFn, duration, winner) {
-    const from    = angle;
-    const startTs = performance.now();
+    const h     = itemH();
+    const fromY = renderY;
+    const toY   = -targetIdx * h;
+    const dur   = 2600 + Math.random() * 500;
+    const start = performance.now();
 
     (function frame(now) {
-        const t   = Math.min((now - startTs) / duration, 1);
-        const deg = from + (targetAngle - from) * easeFn(t);
-        rotor.style.transform = `rotateY(${deg}deg)`;
-
+        const t = Math.min((now - start) / dur, 1);
+        setY(fromY + (toY - fromY) * easeSpinOut(t), false);
         if (t < 1) {
             requestAnimationFrame(frame);
         } else {
-            angle   = targetAngle;
-            spinning = false;
+            slotIdx    = targetIdx;
+            lastWinner = winner;
+            spinning   = false;
             btn.disabled = false;
-            btn.textContent = 'SPIN AGAIN';
-            wearToday.classList.add('show');
-            ambient.style.background = glows[winner];
+            ambient.style.background = WATCHES[winner].glow;
             ambient.classList.add('show');
+
+            // Trigger dramatic pull reveal on winning watch image
+            const winItem = strip.children[targetIdx];
+            if (winItem) {
+                const wrap = winItem.querySelector('.slot-img-wrap');
+                wrap.classList.remove('watch-reveal');
+                void wrap.offsetWidth;
+                wrap.classList.add('watch-reveal');
+            }
+
+            // Silently reset to equivalent position if drifting toward end of strip
+            if (slotIdx > (REPS - 5) * N) {
+                slotIdx -= Math.floor(REPS / 2) * N;
+                setY(-slotIdx * itemH(), true);
+            }
         }
-    })(startTs);
+    })(start);
 }
 
-// ── Spacebar ─────────────────────────────────────
+// ── Spacebar ──────────────────────────────────────
 document.addEventListener('keydown', e => {
-    if (e.code === 'Space') {
-        e.preventDefault();
-        spin();
-    }
+    if (e.code === 'Space') { e.preventDefault(); spin(); }
 });
 
-// ── Touch swipe to rotate ─────────────────────────
-// face i is at front when rotor = -i*120 (mod 360)
-// display mods: face0→0°, face1→240°, face2→120°
-const FACE_MODS = [0, 240, 120]; // index = face number
+// ── Touch — swipe to browse, tap to spin ──────────
+let touchStartY        = null;
+let touchStartY_render = 0;
+let touchMoved         = false;
+let lastTouchY         = null;
+let lastTouchTime      = null;
+let velSamples         = [];
+let lastTickIdx        = null;
 
-function nearestFace() {
-    const currMod = ((angle % 360) + 360) % 360;
-    let best = { face: 0, signedDist: 0 };
-    let minAbs = Infinity;
-
-    for (let i = 0; i < 3; i++) {
-        let d = currMod - FACE_MODS[i];
-        // wrap to [-180, 180]
-        if (d >  180) d -= 360;
-        if (d < -180) d += 360;
-        if (Math.abs(d) < minAbs) {
-            minAbs = Math.abs(d);
-            best = { face: i, signedDist: d };
-        }
-    }
-    return best;
+function fireTick(idx) {
+    const item = strip.children[idx];
+    if (!item) return;
+    const wrap = item.querySelector('.slot-img-wrap');
+    wrap.classList.remove('slot-tick');
+    void wrap.offsetWidth;
+    wrap.classList.add('slot-tick');
 }
 
-function snapToNearest() {
-    const { face, signedDist } = nearestFace();
-    const targetAngle = angle - signedDist;
-    const duration    = 200 + Math.abs(signedDist) * 2.5;
+document.addEventListener('touchstart', e => {
+    if (spinning) return;
+    touchStartY        = e.touches[0].clientY;
+    touchStartY_render = renderY;
+    lastTouchY         = touchStartY;
+    lastTouchTime      = performance.now();
+    touchMoved         = false;
+    velSamples         = [];
+    lastTickIdx        = Math.round(-renderY / itemH());
+    ambient.classList.remove('show');
+}, { passive: true });
 
-    spinning = true;
-    btn.disabled = true;
-    const from    = angle;
-    const startTs = performance.now();
+document.addEventListener('touchmove', e => {
+    if (spinning || touchStartY === null) return;
+    const y   = e.touches[0].clientY;
+    const now = performance.now();
+    const dt  = now - lastTouchTime;
+    if (Math.abs(y - touchStartY) > 8) touchMoved = true;
+    if (dt > 0) {
+        velSamples.push({ v: (lastTouchY - y) / dt, t: now });
+        if (velSamples.length > 6) velSamples.shift();
+    }
+    lastTouchY    = y;
+    lastTouchTime = now;
+    setY(touchStartY_render - (touchStartY - y), true);
+
+    // Fire tick animation each time a new slot crosses to center
+    const centerIdx = Math.round(-renderY / itemH());
+    if (centerIdx !== lastTickIdx) {
+        fireTick(centerIdx);
+        lastTickIdx = centerIdx;
+    }
+}, { passive: true });
+
+document.addEventListener('touchend', () => {
+    if (touchStartY === null) return;
+    const wasTap = !touchMoved;
+    touchStartY = null;
+    touchMoved  = false;
+    if (wasTap) return; // tap does nothing — use the SPIN button
+
+    // Compute flick velocity and snap to nearest watch (±3 max)
+    const now    = performance.now();
+    const recent = velSamples.filter(s => now - s.t < 120);
+    const vel    = recent.length
+        ? recent.reduce((s, x) => s + x.v, 0) / recent.length
+        : 0;
+
+    const h         = itemH();
+    const rawIdx    = -renderY / h;
+    const flick     = Math.max(-3, Math.min(3, Math.round(vel * 380 / h)));
+    let   targetIdx = Math.round(rawIdx) + flick;
+    targetIdx = Math.max(1, Math.min(REPS * N - 2, targetIdx));
+
+    const fromY = renderY;
+    const toY   = -targetIdx * h;
+    // Snappy: 80–200 ms regardless of distance
+    const dur   = 80 + Math.min(Math.abs(toY - fromY) * 0.14, 120);
+    const start = performance.now();
+    spinning = true; btn.disabled = true;
 
     (function frame(now) {
-        const t   = Math.min((now - startTs) / duration, 1);
-        const deg = from + (targetAngle - from) * easeOutCubic(t);
-        rotor.style.transform = `rotateY(${deg}deg)`;
-
+        const t = Math.min((now - start) / dur, 1);
+        setY(fromY + (toY - fromY) * easeOutBack(t), false);
         if (t < 1) {
             requestAnimationFrame(frame);
         } else {
-            angle    = targetAngle;
-            spinning = false;
+            slotIdx    = targetIdx;
+            lastWinner = slotIdx % N;
+            spinning   = false;
             btn.disabled = false;
-            btn.textContent = 'SPIN AGAIN';
-            wearToday.classList.add('show');
-            ambient.style.background = glows[face];
+            ambient.style.background = WATCHES[lastWinner].glow;
             ambient.classList.add('show');
+            // Subtle reveal on swipe-settle too
+            fireTick(targetIdx);
         }
-    })(startTs);
-}
-
-let touchStartX    = null;
-let touchStartAngle = null;
-let lastTouchX     = null;
-let touchVelocity  = 0;
-let lastTouchTime  = null;
-
-document.getElementById('swivelWrap').addEventListener('touchstart', e => {
-    if (spinning) return;
-    touchStartX     = e.touches[0].clientX;
-    touchStartAngle = angle;
-    lastTouchX      = touchStartX;
-    touchVelocity   = 0;
-    lastTouchTime   = performance.now();
-    wearToday.classList.remove('show');
-}, { passive: true });
-
-document.getElementById('swivelWrap').addEventListener('touchmove', e => {
-    if (spinning || touchStartX === null) return;
-
-    const x    = e.touches[0].clientX;
-    const now  = performance.now();
-    const dt   = now - lastTouchTime;
-
-    if (dt > 0) {
-        touchVelocity = (lastTouchX - x) / dt; // deg per ms (scaled below)
-    }
-    lastTouchX   = x;
-    lastTouchTime = now;
-
-    const delta = x - touchStartX;
-    angle = touchStartAngle - delta * 0.45;
-    rotor.style.transform = `rotateY(${angle}deg)`;
-}, { passive: true });
-
-document.getElementById('swivelWrap').addEventListener('touchend', () => {
-    if (touchStartX === null) return;
-    touchStartX = null;
-
-    // Small flick momentum then snap
-    const momentum = touchVelocity * 120; // project forward ~120ms
-    angle -= momentum;
-    rotor.style.transform = `rotateY(${angle}deg)`;
-
-    requestAnimationFrame(() => snapToNearest());
+    })(start);
 });
 </script>
 
