@@ -77,17 +77,36 @@
             position: fixed;
             inset: 0;
             opacity: 0;
-            transition: background 0.3s ease;
+            transition: opacity 0.5s ease, background 0.3s ease;
             pointer-events: none;
             z-index: 0;
         }
-        @keyframes auraSettle {
+        #ambient.show { opacity: 0.60; }
+
+        /* ── Per-watch aura burst animations ────────────── */
+        @keyframes auraBlue {
             0%   { opacity: 0;    }
-            25%  { opacity: 1;    }
-            60%  { opacity: 0.80; }
+            22%  { opacity: 1;    }
+            60%  { opacity: 0.78; }
             100% { opacity: 0.60; }
         }
-        #ambient.show { animation: auraSettle 1.6s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+        @keyframes auraGreen {
+            0%   { opacity: 0;    }
+            18%  { opacity: 1;    }
+            45%  { opacity: 0.88; }
+            72%  { opacity: 0.75; }
+            100% { opacity: 0.60; }
+        }
+        @keyframes auraLed {
+            0%   { opacity: 0;    }
+            5%   { opacity: 1;    }
+            18%  { opacity: 0.92; }
+            55%  { opacity: 0.70; }
+            100% { opacity: 0.55; }
+        }
+        #ambient.burst-blue  { animation: auraBlue  1.7s cubic-bezier(0.22,1,0.36,1) forwards; }
+        #ambient.burst-green { animation: auraGreen 2.0s cubic-bezier(0.22,1,0.36,1) forwards; }
+        #ambient.burst-led   { animation: auraLed   1.3s cubic-bezier(0.22,1,0.36,1) forwards; }
 
         /* ── Wordmark ───────────────────────────────────── */
         .wordmark {
@@ -300,22 +319,28 @@
 <script>
 const WATCHES = [
     {
-        img:  'photos/aquaterra.png',
-        name: 'Omega Seamaster',
-        sub:  'Aqua Terra · 38mm',
-        glow: 'radial-gradient(ellipse 75% 65% at 50% 50%, rgba(25,65,200,0.55) 0%, rgba(15,40,130,0.20) 55%, transparent 80%)'
+        img:   'photos/aquaterra.png',
+        name:  'Omega Seamaster',
+        sub:   'Aqua Terra · 38mm',
+        burst: 'burst-blue',
+        glowDark:  'radial-gradient(ellipse 80% 70% at 50% 50%, rgba(18,55,220,0.70) 0%, rgba(10,30,140,0.28) 55%, transparent 82%)',
+        glowLight: 'radial-gradient(ellipse 80% 70% at 50% 50%, rgba(18,65,210,0.32) 0%, rgba(10,40,160,0.12) 55%, transparent 82%)'
     },
     {
-        img:  'photos/speedtimer_nightvision.png',
-        name: 'Seiko Prospex',
-        sub:  'Speedtimer · SSC813',
-        glow: 'radial-gradient(ellipse 75% 65% at 50% 50%, rgba(180,130,30,0.45) 0%, rgba(120,85,15,0.18) 55%, transparent 80%)'
+        img:   'photos/speedtimer_nightvision.png',
+        name:  'Seiko Prospex',
+        sub:   'Speedtimer · SSC813',
+        burst: 'burst-green',
+        glowDark:  'radial-gradient(ellipse 80% 70% at 50% 50%, rgba(100,220,45,0.65) 0%, rgba(55,160,20,0.28) 55%, transparent 82%)',
+        glowLight: 'radial-gradient(ellipse 80% 70% at 50% 50%, rgba(70,185,25,0.30) 0%, rgba(40,130,15,0.12) 55%, transparent 82%)'
     },
     {
-        img:  'photos/presage_white.png',
-        name: 'Seiko Presage',
-        sub:  'SRPB43 · Automatic',
-        glow: 'radial-gradient(ellipse 75% 65% at 50% 50%, rgba(200,185,150,0.45) 0%, rgba(160,145,110,0.18) 55%, transparent 80%)'
+        img:   'photos/presage_white.png',
+        name:  'Seiko Presage',
+        sub:   'SRPB43 · Automatic',
+        burst: 'burst-led',
+        glowDark:  'radial-gradient(ellipse 80% 70% at 50% 50%, rgba(220,235,255,0.80) 0%, rgba(180,215,255,0.35) 45%, transparent 78%)',
+        glowLight: 'radial-gradient(ellipse 80% 70% at 50% 50%, rgba(190,215,255,0.38) 0%, rgba(155,195,255,0.15) 45%, transparent 78%)'
     }
 ];
 
@@ -351,12 +376,27 @@ document.getElementById('dateLine').textContent =
         weekday: 'long', month: 'long', day: 'numeric'
     }).toUpperCase();
 
+// ── Helper: show the aura for a given watch index ─
+function showAura(idx) {
+    const w = WATCHES[idx];
+    const isDark = document.body.classList.contains('dark');
+    ambient.style.background = isDark ? w.glowDark : w.glowLight;
+    ambient.classList.remove('show', 'burst-blue', 'burst-green', 'burst-led');
+    void ambient.offsetWidth; // force reflow to restart animation
+    ambient.classList.add('show', w.burst);
+}
+
 // ── Dark mode toggle ──────────────────────────────
 const toggleBtn = document.getElementById('toggleDark');
 toggleBtn.addEventListener('click', e => {
     e.stopPropagation();
     const isDark = document.body.classList.toggle('dark');
     toggleBtn.textContent = isDark ? '☀' : '🌙';
+    // Re-apply glow in new mode if a watch is showing
+    if (lastWinner >= 0 && ambient.classList.contains('show')) {
+        const w = WATCHES[lastWinner];
+        ambient.style.background = isDark ? w.glowDark : w.glowLight;
+    }
 });
 
 // ── State ─────────────────────────────────────────
@@ -406,7 +446,7 @@ function spin() {
     if (spinning) return;
     spinning = true;
     btn.disabled = true;
-    ambient.classList.remove('show');
+    ambient.classList.remove('show', 'burst-blue', 'burst-green', 'burst-led');
 
     const others = [0, 1, 2].filter(i => i !== lastWinner);
     const winner = others[Math.floor(Math.random() * others.length)];
@@ -433,8 +473,7 @@ function spin() {
             lastWinner = winner;
             spinning   = false;
             btn.disabled = false;
-            ambient.style.background = WATCHES[winner].glow;
-            ambient.classList.add('show');
+            showAura(winner);
 
             // Silently reset if drifting toward start of strip
             if (slotIdx < 5 * N) {
@@ -477,7 +516,7 @@ document.addEventListener('touchstart', e => {
     touchMoved         = false;
     velSamples         = [];
     lastTickIdx        = Math.round(-renderY / itemH());
-    ambient.classList.remove('show');
+    ambient.classList.remove('show', 'burst-blue', 'burst-green', 'burst-led');
 }, { passive: true });
 
 document.addEventListener('touchmove', e => {
@@ -543,8 +582,7 @@ document.addEventListener('touchend', () => {
             lastWinner = slotIdx % N;
             spinning   = false;
             btn.disabled = false;
-            ambient.style.background = WATCHES[lastWinner].glow;
-            ambient.classList.add('show');
+            showAura(lastWinner);
             // Subtle reveal on swipe-settle too
             fireTick(targetIdx);
         }
