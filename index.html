@@ -14,8 +14,8 @@
             --img-shadow:       drop-shadow(0 28px 60px rgba(70,70,70,0.22)) drop-shadow(0 8px 20px rgba(50,50,50,0.12));
             --face-name:        rgba(10,10,30,0.75);
             --face-sub:         rgba(10,10,30,0.30);
-            --wordmark:         rgba(10,10,30,0.22);
-            --dateline:         rgba(10,10,30,0.18);
+            --wordmark:         rgba(10,10,30,0.55);
+            --dateline:         rgba(10,10,30,0.50);
             /* button — solid dark fill in light mode */
             --btn-bg:           rgba(11, 11, 28, 0.92);
             --btn-text:         rgba(255, 255, 255, 0.93);
@@ -29,11 +29,11 @@
         body.dark {
             --bg:               #0a0a0a;
             --spotlight:        radial-gradient(ellipse 55% 70% at 50% 40%, rgba(255,255,255,0.04) 0%, transparent 65%);
-            --img-shadow:       drop-shadow(0 35px 80px rgba(0,0,0,0.95)) drop-shadow(0 10px 30px rgba(0,0,0,0.7));
+            --img-shadow:       drop-shadow(0 12px 28px rgba(0,0,0,0.50));
             --face-name:        rgba(230,230,230,0.90);
             --face-sub:         rgba(200,200,200,0.45);
-            --wordmark:         rgba(200,200,200,0.22);
-            --dateline:         rgba(200,200,200,0.18);
+            --wordmark:         rgba(210,210,210,0.65);
+            --dateline:         rgba(210,210,210,0.60);
             /* button — frosted-glass in dark mode, no blue glow */
             --btn-bg:           rgba(255,255,255,0.07);
             --btn-text:         rgba(230,230,230,0.96);
@@ -68,9 +68,10 @@
             inset: 0;
             background: var(--spotlight);
             pointer-events: none;
-            transition: background 0.5s;
+            transition: background 0.5s, opacity 0.5s;
             z-index: 0;
         }
+        body.dark::before { opacity: 0; }
 
         #ambient {
             position: fixed;
@@ -88,8 +89,8 @@
             top: 28px; left: 50%;
             transform: translateX(-50%);
             color: var(--wordmark);
-            font-size: 9px;
-            letter-spacing: 7px;
+            font-size: 11px;
+            letter-spacing: 6px;
             text-transform: uppercase;
             font-weight: 600;
             white-space: nowrap;
@@ -125,9 +126,10 @@
             bottom: 26px; left: 50%;
             transform: translateX(-50%);
             color: var(--dateline);
-            font-size: 9px;
-            letter-spacing: 3.5px;
+            font-size: 11px;
+            letter-spacing: 3px;
             text-transform: uppercase;
+            font-weight: 600;
             white-space: nowrap;
             transition: color 0.5s;
             pointer-events: none;
