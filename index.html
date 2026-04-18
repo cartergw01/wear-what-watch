@@ -104,9 +104,16 @@
             55%  { opacity: 0.70; }
             100% { opacity: 0.55; }
         }
+        @keyframes auraGold {
+            0%   { opacity: 0;    }
+            20%  { opacity: 1;    }
+            55%  { opacity: 0.82; }
+            100% { opacity: 0.62; }
+        }
         #ambient.burst-blue  { animation: auraBlue  1.7s cubic-bezier(0.22,1,0.36,1) forwards; }
         #ambient.burst-green { animation: auraGreen 2.0s cubic-bezier(0.22,1,0.36,1) forwards; }
         #ambient.burst-led   { animation: auraLed   1.3s cubic-bezier(0.22,1,0.36,1) forwards; }
+        #ambient.burst-gold  { animation: auraGold  1.9s cubic-bezier(0.22,1,0.36,1) forwards; }
 
         /* ── Wordmark ───────────────────────────────────── */
         .wordmark {
@@ -341,6 +348,14 @@ const WATCHES = [
         burst: 'burst-led',
         glowDark:  'radial-gradient(ellipse 80% 70% at 50% 50%, rgba(220,235,255,0.80) 0%, rgba(180,215,255,0.35) 45%, transparent 78%)',
         glowLight: 'radial-gradient(ellipse 80% 70% at 50% 50%, rgba(190,215,255,0.38) 0%, rgba(155,195,255,0.15) 45%, transparent 78%)'
+    },
+    {
+        img:   'photos/luminor_due.png',
+        name:  'Panerai Luminor Due',
+        sub:   'OP7242 · 38mm',
+        burst: 'burst-gold',
+        glowDark:  'radial-gradient(ellipse 80% 70% at 50% 50%, rgba(210,140,30,0.72) 0%, rgba(175,95,15,0.30) 55%, transparent 82%)',
+        glowLight: 'radial-gradient(ellipse 80% 70% at 50% 50%, rgba(200,130,20,0.30) 0%, rgba(165,90,10,0.12) 55%, transparent 82%)'
     }
 ];
 
@@ -381,7 +396,7 @@ function showAura(idx) {
     const w = WATCHES[idx];
     const isDark = document.body.classList.contains('dark');
     ambient.style.background = isDark ? w.glowDark : w.glowLight;
-    ambient.classList.remove('show', 'burst-blue', 'burst-green', 'burst-led');
+    ambient.classList.remove('show', 'burst-blue', 'burst-green', 'burst-led', 'burst-gold');
     void ambient.offsetWidth; // force reflow to restart animation
     ambient.classList.add('show', w.burst);
 }
@@ -446,9 +461,9 @@ function spin() {
     if (spinning) return;
     spinning = true;
     btn.disabled = true;
-    ambient.classList.remove('show', 'burst-blue', 'burst-green', 'burst-led');
+    ambient.classList.remove('show', 'burst-blue', 'burst-green', 'burst-led', 'burst-gold');
 
-    const others = [0, 1, 2].filter(i => i !== lastWinner);
+    const others = Array.from({length: N}, (_, i) => i).filter(i => i !== lastWinner);
     const winner = others[Math.floor(Math.random() * others.length)];
 
     // Go backward 3 full cycles + backDelta to land on winner (spins DOWN)
@@ -516,7 +531,7 @@ document.addEventListener('touchstart', e => {
     touchMoved         = false;
     velSamples         = [];
     lastTickIdx        = Math.round(-renderY / itemH());
-    ambient.classList.remove('show', 'burst-blue', 'burst-green', 'burst-led');
+    ambient.classList.remove('show', 'burst-blue', 'burst-green', 'burst-led', 'burst-gold');
 }, { passive: true });
 
 document.addEventListener('touchmove', e => {
