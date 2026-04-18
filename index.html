@@ -463,8 +463,7 @@ function spin() {
     btn.disabled = true;
     ambient.classList.remove('show', 'burst-blue', 'burst-green', 'burst-led', 'burst-gold');
 
-    const others = Array.from({length: N}, (_, i) => i).filter(i => i !== lastWinner);
-    const winner = others[Math.floor(Math.random() * others.length)];
+    const winner = Math.floor(Math.random() * N);
 
     // Go backward 3 full cycles + backDelta to land on winner (spins DOWN)
     const currentWatch = slotIdx % N;
