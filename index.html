@@ -444,10 +444,10 @@ layout();
 window.addEventListener('resize', layout);
 
 // ── Easing ────────────────────────────────────────
-// Quart ease-out: starts fast, decelerates hard like gravity — no bounce
+// High-power ease-out: fast start, very slow drift into the final position
 function easeSpinOut(t) {
     if (t >= 1) return 1;
-    return 1 - Math.pow(1 - t, 4);
+    return 1 - Math.pow(1 - t, 8);
 }
 // Spring snap with slight overshoot — makes scroll feel clicky
 function easeOutBack(t) {
@@ -473,7 +473,7 @@ function spin() {
     const h     = itemH();
     const fromY = renderY;
     const toY   = -targetIdx * h;
-    const dur   = 2600 + Math.random() * 500;
+    const dur   = 3000 + Math.random() * 500;
     const start = performance.now();
 
     (function frame(now) {
